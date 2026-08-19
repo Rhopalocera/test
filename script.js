@@ -32,9 +32,12 @@ function targetPattern(solution) {
     commands.forEach((command) => {
       if (command === 'left') direction = (direction + 3) % 4;
       if (command === 'right') direction = (direction + 1) % 4;
+      if (command === 'straight') {
+        row += directions[direction][0];
+        col += directions[direction][1];
+      }
     });
     if (isBlack) colors.delete(key); else colors.add(key);
-    row += directions[direction][0]; col += directions[direction][1];
     if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) return null;
   }
   return colors;
@@ -100,12 +103,16 @@ function render() {
 function step() {
   const key = `${state.row},${state.col}`;
   const color = state.blackCells.has(key) ? 'black' : 'white';
+  if (state.blackCells.has(key)) state.blackCells.delete(key); else state.blackCells.add(key);
   rules[color].forEach((command) => {
     if (command === 'left') state.direction = (state.direction + 3) % 4;
     if (command === 'right') state.direction = (state.direction + 1) % 4;
+    if (command === 'straight') {
+      state.row += directions[state.direction][0];
+      state.col += directions[state.direction][1];
+    }
   });
-  if (state.blackCells.has(key)) state.blackCells.delete(key); else state.blackCells.add(key);
-  state.row += directions[state.direction][0]; state.col += directions[state.direction][1]; state.steps += 1;
+  state.steps += 1;
 }
 
 function run() {
