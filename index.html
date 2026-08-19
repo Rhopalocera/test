@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANT / Langton's Ant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="ANT home"><span class="brand-mark">✳</span><span>ANT<span class="muted">/</span>01</span></a>
+      <div class="status-line"><span class="live-dot"></span><span>PUZZLE IN PROGRESS</span><span class="divider"></span><span id="levelLabel">LEVEL 01</span></div>
+      <button class="icon-button" id="resetTop" aria-label="ステージをリセット" title="リセット">↻</button>
+    </header>
+
+    <section class="hero-row">
+      <div>
+        <p class="eyebrow">CELLULAR AUTOMATA / LOGIC PUZZLE</p>
+        <h1>READ THE<br><em>GRID.</em></h1>
+      </div>
+      <p class="intro">ありは色を読み、命令に従い、<br>一歩ずつ未知の模様を描く。</p>
+    </section>
+
+    <section class="game-layout">
+      <div class="board-column">
+        <div class="board-heading"><span>LIVE BOARD</span><span class="board-size">11 × 11 CELLS</span></div>
+        <div class="board-frame">
+          <div class="board-wrap"><div id="board" class="board" role="grid" aria-label="ゲーム盤"></div></div>
+          <div class="board-caption"><span><b class="caption-dot black"></b>BLACK CELL</span><span><b class="caption-dot white"></b>WHITE CELL</span><span><b class="caption-ant"></b>ANT / FACING <strong id="directionLabel">N</strong></span></div>
+        </div>
+      </div>
+
+      <aside class="control-column">
+        <div class="panel intro-panel"><div class="panel-kicker">MISSION / <span id="missionNumber">01</span></div><h2>Make the<br><span>pattern.</span></h2><p>このステージのゴールは、ありを指定されたステップ数だけ動かした後、<strong>右の模様</strong>を完成させること。</p></div>
+        <div class="panel target-panel"><div class="panel-title"><span>TARGET PATTERN</span><span id="targetSteps">12 STEPS</span></div><div id="targetBoard" class="target-board" aria-label="目標の模様"></div><div class="target-note">黒いセルの配置が完全に一致すると成功。</div></div>
+        <div class="panel rules-panel"><div class="panel-title"><span>RULES</span><span class="rule-count">2 INPUTS</span></div><div class="rule-row"><span class="swatch black"></span><span>BLACK</span><button class="turn-button active" data-color="black" data-turn="left">↶</button><span class="turn-label" id="blackTurn">TURN LEFT</span></div><div class="rule-row"><span class="swatch white"></span><span>WHITE</span><button class="turn-button" data-color="white" data-turn="right">↷</button><span class="turn-label" id="whiteTurn">TURN RIGHT</span></div><p class="rule-hint">色をクリックして命令を切り替える</p></div>
+        <div class="run-row"><button class="run-button" id="runButton"><span class="play-icon">▶</span><span>RUN <b id="runSteps">12</b> STEPS</span></button><button class="reset-button" id="resetButton">RESET <span>↻</span></button></div>
+        <div class="result" id="result" aria-live="polite"></div>
+      </aside>
+    </section>
+
+    <footer><span>LANGTON'S ANT / 1986</span><span>DESIGNED FOR CURIOUS MINDS</span><span>01 — 04</span></footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
