@@ -7,7 +7,7 @@ const boardElement = document.querySelector('#board');
 const targetElement = document.querySelector('#targetBoard');
 const resultElement = document.querySelector('#result');
 let state;
-let rules = { black: 'left', white: 'right' };
+let rules = { black: ['left', 'none', 'none'], white: ['right', 'none', 'none'] };
 
 function makeGrid(element, size, cellClass) {
   element.innerHTML = '';
@@ -27,8 +27,11 @@ function targetPattern() {
     const key = `${row},${col}`;
     const isBlack = colors.has(key);
     pattern.add(key);
-    if (isBlack) direction = (direction + 3) % 4;
-    else direction = (direction + 1) % 4;
+    const commands = isBlack ? rules.black : rules.white;
+    commands.forEach((command) => {
+      if (command === 'left') direction = (direction + 3) % 4;
+      if (command === 'right') direction = (direction + 1) % 4;
+    });
     if (isBlack) colors.delete(key); else colors.add(key);
     row += directions[direction][0]; col += directions[direction][1];
   }
@@ -65,7 +68,10 @@ function render() {
 function step() {
   const key = `${state.row},${state.col}`;
   const color = state.blackCells.has(key) ? 'black' : 'white';
-  state.direction = rules[color] === 'left' ? (state.direction + 3) % 4 : (state.direction + 1) % 4;
+  rules[color].forEach((command) => {
+    if (command === 'left') state.direction = (state.direction + 3) % 4;
+    if (command === 'right') state.direction = (state.direction + 1) % 4;
+  });
   if (state.blackCells.has(key)) state.blackCells.delete(key); else state.blackCells.add(key);
   state.row += directions[state.direction][0]; state.col += directions[state.direction][1]; state.steps += 1;
 }
@@ -81,10 +87,10 @@ function run() {
 
 makeGrid(boardElement, SIZE, 'cell');
 renderTarget(); reset();
-document.querySelectorAll('.turn-button').forEach((button) => button.addEventListener('click', () => {
-  const { color, turn } = button.dataset; rules[color] = turn;
-  document.querySelectorAll(`[data-color="${color}"]`).forEach((item) => item.classList.toggle('active', item === button));
-  document.querySelector(`#${color}Turn`).textContent = `TURN ${turn.toUpperCase()}`;
+document.querySelectorAll('.command-slots').forEach((slotGroup) => slotGroup.addEventListener('change', () => {
+  rules[slotGroup.dataset.color] = [...slotGroup.querySelectorAll('select')].map((select) => select.value);
+  resultElement.textContent = '';
+  resultElement.className = 'result';
 }));
 document.querySelector('#runButton').addEventListener('click', run);
 document.querySelector('#resetButton').addEventListener('click', reset);
