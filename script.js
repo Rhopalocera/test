@@ -9,7 +9,8 @@ const resultElement = document.querySelector('#result');
 let state;
 let history = [];
 let currentStep = 0;
-let rules = { black: ['left', 'none', 'none'], white: ['right', 'none', 'none'] };
+let rules = { black: ['none', 'none', 'none'], white: ['none', 'none', 'none'] };
+const hiddenSolution = createPuzzleRules();
 
 function makeGrid(element, size, cellClass) {
   element.innerHTML = '';
@@ -21,26 +22,43 @@ function makeGrid(element, size, cellClass) {
   }
 }
 
-function targetPattern() {
-  const pattern = new Set();
-  let row = start.row; let col = start.col; let direction = start.direction;
+function targetPattern(solution) {
   const colors = new Set();
+  let row = start.row; let col = start.col; let direction = start.direction;
   for (let step = 0; step < STEPS; step += 1) {
     const key = `${row},${col}`;
     const isBlack = colors.has(key);
-    pattern.add(key);
-    const commands = isBlack ? rules.black : rules.white;
+    const commands = isBlack ? solution.black : solution.white;
     commands.forEach((command) => {
       if (command === 'left') direction = (direction + 3) % 4;
       if (command === 'right') direction = (direction + 1) % 4;
     });
     if (isBlack) colors.delete(key); else colors.add(key);
     row += directions[direction][0]; col += directions[direction][1];
+    if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) return null;
   }
-  return pattern;
+  return colors;
 }
 
-const target = targetPattern();
+function createPuzzleRules() {
+  const commandOptions = ['left', 'right', 'straight', 'none'];
+  const makeSequence = () => {
+    const length = Math.floor(Math.random() * 4);
+    return Array.from({ length }, () => commandOptions[Math.floor(Math.random() * commandOptions.length)]);
+  };
+  let puzzle;
+  let pattern;
+  do {
+    puzzle = { black: makeSequence(), white: makeSequence() };
+    pattern = targetPattern(puzzle);
+  } while (!pattern || pattern.size === 0 || [...pattern].some((key) => {
+    const [row, col] = key.split(',').map(Number);
+    return row < 2 || row > 8 || col < 2 || col > 8;
+  }));
+  return puzzle;
+}
+
+const target = targetPattern(hiddenSolution);
 function renderTarget() {
   makeGrid(targetElement, TARGET_SIZE, 'target-cell');
   target.forEach((key) => {
