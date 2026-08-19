@@ -7,6 +7,8 @@ const boardElement = document.querySelector('#board');
 const targetElement = document.querySelector('#targetBoard');
 const resultElement = document.querySelector('#result');
 let state;
+let history = [];
+let currentStep = 0;
 let rules = { black: ['left', 'none', 'none'], white: ['right', 'none', 'none'] };
 
 function makeGrid(element, size, cellClass) {
@@ -50,9 +52,20 @@ function renderTarget() {
 
 function reset() {
   state = { row: start.row, col: start.col, direction: start.direction, blackCells: new Set(), steps: 0 };
+  history = [snapshot(state)];
+  for (let stepIndex = 0; stepIndex < STEPS; stepIndex += 1) {
+    step();
+    history.push(snapshot(state));
+  }
+  currentStep = 0;
+  state = snapshot(history[0]);
   resultElement.textContent = '';
   resultElement.className = 'result';
   render();
+}
+
+function snapshot(source) {
+  return { row: source.row, col: source.col, direction: source.direction, blackCells: new Set(source.blackCells), steps: source.steps };
 }
 
 function render() {
@@ -63,6 +76,7 @@ function render() {
     if (row === state.row && col === state.col) cell.classList.add('ant');
   });
   document.querySelector('#directionLabel').textContent = ['N', 'E', 'S', 'W'][state.direction];
+  document.querySelector('#currentStep').textContent = String(currentStep).padStart(2, '0');
 }
 
 function step() {
@@ -77,8 +91,8 @@ function step() {
 }
 
 function run() {
-  reset();
-  for (let stepIndex = 0; stepIndex < STEPS; stepIndex += 1) step();
+  currentStep = STEPS;
+  state = snapshot(history[currentStep]);
   render();
   const matches = [...state.blackCells].every((key) => target.has(key)) && [...target].every((key) => state.blackCells.has(key));
   resultElement.textContent = matches ? '✓ PATTERN MATCHED / MISSION COMPLETE' : '× NOT YET / ADJUST THE RULES';
@@ -100,9 +114,22 @@ document.querySelectorAll('.command-slots').forEach((slotGroup) => slotGroup.add
   slot.title = commandNames[nextCommand];
   slot.setAttribute('aria-label', `${slotGroup.dataset.color === 'black' ? '黒' : '白'}タイルの命令: ${commandNames[nextCommand]}`);
   rules[slotGroup.dataset.color] = [...slotGroup.querySelectorAll('.command-slot')].map((button) => button.dataset.command);
-  resultElement.textContent = '';
-  resultElement.className = 'result';
+  reset();
 }));
 document.querySelector('#runButton').addEventListener('click', run);
 document.querySelector('#resetButton').addEventListener('click', reset);
 document.querySelector('#resetTop').addEventListener('click', reset);
+document.querySelector('#previousStep').addEventListener('click', () => {
+  currentStep = (currentStep - 1 + STEPS + 1) % (STEPS + 1);
+  state = snapshot(history[currentStep]);
+  resultElement.textContent = '';
+  resultElement.className = 'result';
+  render();
+});
+document.querySelector('#nextStep').addEventListener('click', () => {
+  currentStep = (currentStep + 1) % (STEPS + 1);
+  state = snapshot(history[currentStep]);
+  resultElement.textContent = '';
+  resultElement.className = 'result';
+  render();
+});
