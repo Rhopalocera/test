@@ -87,8 +87,19 @@ function run() {
 
 makeGrid(boardElement, SIZE, 'cell');
 renderTarget(); reset();
-document.querySelectorAll('.command-slots').forEach((slotGroup) => slotGroup.addEventListener('change', () => {
-  rules[slotGroup.dataset.color] = [...slotGroup.querySelectorAll('select')].map((select) => select.value);
+const commandCycle = ['none', 'left', 'right', 'straight'];
+const commandDisplay = { none: '×', left: '↶', right: '↷', straight: '↑' };
+const commandNames = { none: 'なし', left: '左回転', right: '右回転', straight: '直進' };
+document.querySelectorAll('.command-slots').forEach((slotGroup) => slotGroup.addEventListener('click', (event) => {
+  const slot = event.target.closest('.command-slot');
+  if (!slot) return;
+  const nextIndex = (commandCycle.indexOf(slot.dataset.command) + 1) % commandCycle.length;
+  const nextCommand = commandCycle[nextIndex];
+  slot.dataset.command = nextCommand;
+  slot.textContent = commandDisplay[nextCommand];
+  slot.title = commandNames[nextCommand];
+  slot.setAttribute('aria-label', `${slotGroup.dataset.color === 'black' ? '黒' : '白'}タイルの命令: ${commandNames[nextCommand]}`);
+  rules[slotGroup.dataset.color] = [...slotGroup.querySelectorAll('.command-slot')].map((button) => button.dataset.command);
   resultElement.textContent = '';
   resultElement.className = 'result';
 }));
