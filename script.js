@@ -129,9 +129,17 @@ renderTarget(); reset();
 const commandCycle = ['none', 'left', 'right', 'straight'];
 const commandDisplay = { none: '×', left: '↶', right: '↷', straight: '↑' };
 const commandNames = { none: 'なし', left: '左回転', right: '右回転', straight: '直進' };
+document.querySelector('#answerButton').addEventListener('click', () => {
+  document.querySelector('#answerBlack').textContent = hiddenSolution.black.map((command) => commandDisplay[command]).join(' ');
+  document.querySelector('#answerWhite').textContent = hiddenSolution.white.map((command) => commandDisplay[command]).join(' ');
+  document.querySelector('#answerPanel').hidden = false;
+  document.querySelector('#answerButton').setAttribute('aria-expanded', 'true');
+});
 document.querySelectorAll('.command-slots').forEach((slotGroup) => slotGroup.addEventListener('click', (event) => {
   const slot = event.target.closest('.command-slot');
   if (!slot) return;
+  document.querySelectorAll('.command-slot.is-selected').forEach((button) => button.classList.remove('is-selected'));
+  slot.classList.add('is-selected');
   const nextIndex = (commandCycle.indexOf(slot.dataset.command) + 1) % commandCycle.length;
   const nextCommand = commandCycle[nextIndex];
   slot.dataset.command = nextCommand;
