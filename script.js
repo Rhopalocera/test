@@ -138,8 +138,6 @@ document.querySelector('#answerButton').addEventListener('click', () => {
 document.querySelectorAll('.command-slots').forEach((slotGroup) => slotGroup.addEventListener('click', (event) => {
   const slot = event.target.closest('.command-slot');
   if (!slot) return;
-  document.querySelectorAll('.command-slot.is-selected').forEach((button) => button.classList.remove('is-selected'));
-  slot.classList.add('is-selected');
   const nextIndex = (commandCycle.indexOf(slot.dataset.command) + 1) % commandCycle.length;
   const nextCommand = commandCycle[nextIndex];
   slot.dataset.command = nextCommand;
